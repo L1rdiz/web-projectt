@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}Мем #{{ m.id }}{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card bg-dark text-white shadow">
+            <div class="card-header bg-danger text-center">
+                <h4><i class="bi bi-emoji-laughing"></i> Мем от {{ m.user.name }}</h4>
+            </div>
+            <div class="card-body text-center">
+                <img src="{{ url_for('static', filename='generated/' + m.file) }}" class="img-fluid rounded mb-3" alt="meme">
+
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <div class="alert alert-secondary">
+                            <strong>Верх:</strong><br>
+                            "{{ m.top or '—' }}"
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="alert alert-secondary">
+                            <strong>Низ:</strong><br>
+                            "{{ m.bot or '—' }}"
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-center gap-3 mt-3 flex-wrap">
+                    <a href="{{ url_for('fav', mid=m.id) }}" class="btn btn-warning">
+                        <i class="bi bi-star{% if is_fav %}-fill{% endif %}"></i> {% if is_fav %}В избранном{% else %}В избранное{% endif %}
+                    </a>
+                    <a href="{{ url_for('like', id=m.id) }}" class="btn btn-danger">
+                        <i class="bi bi-heart-fill"></i> Лайк ({{ m.likes }})
+                    </a>
+                    <a href="{{ url_for('download', name=m.file) }}" class="btn btn-success">
+                        <i class="bi bi-download"></i> Скачать
+                    </a>
+                </div>
+
+                {% if meme_tags %}
+                <div class="mt-4">
+                    <i class="bi bi-tags"></i> Теги:
+                    {% for t in meme_tags %}
+                    <a href="{{ url_for('tag', name=t.name) }}" class="badge bg-secondary text-decoration-none ms-1">#{{ t.name }}</a>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            <div class="card-footer text-center text-white-50">
+                <small>Создан {{ m.date.strftime('%d.%m.%Y в %H:%M') }}</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

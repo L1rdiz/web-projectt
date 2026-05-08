@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Добавить шаблон{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card bg-dark text-white shadow">
+            <div class="card-header bg-danger text-center">
+                <h4><i class="bi bi-cloud-upload"></i> Добавить шаблон</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label class="form-label">Название</label>
+                        <input type="text" name="name" class="form-control bg-secondary text-white" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Категория</label>
+                        <select name="cat" class="form-select bg-secondary text-white">
+                            <option value="classic">Классические</option>
+                            <option value="animals">Животные</option>
+                            <option value="reaction">Реакции</option>
+                            <option value="custom">Свои</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Картинка</label>
+                        <input type="file" name="img" class="form-control bg-secondary text-white" accept="image/*" required>
+                    </div>
+                    <button type="submit" class="btn btn-danger w-100">Добавить</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

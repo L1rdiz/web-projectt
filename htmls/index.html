@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Главная{% endblock %}
+
+{% block content %}
+
+<div class="text-center mb-5">
+    <h1 class="display-3 text-white mb-3">
+        <i class="bi bi-emoji-laughing"></i> MemGen
+    </h1>
+    <p class="lead text-white-50">Создавай мемы за секунды! Выбирай шаблон, добавляй текст и делись с друзьями</p>
+    <a href="{{ url_for('create') }}" class="btn btn-danger btn-lg mt-3">
+        <i class="bi bi-plus-circle"></i> Создать мем
+    </a>
+</div>
+
+<div class="mb-5">
+    <h2 class="text-white mb-4"><i class="bi bi-star-fill text-warning"></i> Популярные шаблоны</h2>
+    <div class="row g-4">
+        {% for t in p %}
+        <div class="col-md-4 col-lg-2">
+            <div class="card bg-secondary text-white h-100 text-center">
+                <div class="card-body">
+                    <img src="{{ url_for('static', filename='templates/' + t.file) }}" class="img-fluid rounded mb-2" style="height: 100px; object-fit: cover;">
+                    <p class="mt-2 mb-0">{{ t.name }}</p>
+                    <small class="text-white-50">❤️ {{ t.likes }}</small>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-12 text-center text-white-50">
+            <p>Нет шаблонов. <a href="{{ url_for('add') }}">Добавь первый!</a></p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<div>
+    <h2 class="text-white mb-4"><i class="bi bi-shuffle"></i> Случайные мемы</h2>
+    <div class="row g-4">
+        {% for m in r %}
+        <div class="col-md-4 col-lg-3">
+            <div class="card bg-dark text-white h-100">
+                <img src="{{ url_for('static', filename='generated/' + m.file) }}" class="card-img-top" alt="meme" style="height: 200px; object-fit: cover;">
+                <div class="card-body">
+                    <p class="card-text small">{{ m.top }} | {{ m.bot }}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-white-50">by {{ m.user.name }}</small>
+                        <small class="text-danger">❤️ {{ m.likes }}</small>
+                    </div>
+                    <a href="{{ url_for('view_meme', id=m.id) }}" class="btn btn-sm btn-outline-danger mt-2 w-100">Смотреть</a>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-12 text-center text-white-50 py-5">
+            <h3> Нет мемов...</h3>
+            <p>Будь первым кто создаст мем!</p>
+            <a href="{{ url_for('create') }}" class="btn btn-danger">Создать мем</a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}

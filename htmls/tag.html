@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Тег: {{ tag }}{% endblock %}
+{% block content %}
+
+<h2 class="text-white mb-4"><i class="bi bi-hash"></i> Мемы с тегом <span class="text-danger">{{ tag }}</span></h2>
+
+<div class="row g-4">
+    {% for m in memes %}
+    <div class="col-md-4 col-lg-3">
+        <div class="card bg-dark text-white h-100">
+            <img src="{{ url_for('static', filename='generated/' + m.file) }}" class="card-img-top" alt="meme" style="height: 200px; object-fit: cover;">
+            <div class="card-body">
+                <p class="card-text small">{{ m.top }} | {{ m.bot }}</p>
+                <a href="{{ url_for('view_meme', id=m.id) }}" class="btn btn-sm btn-danger w-100">Открыть</a>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-12 text-center text-white-50 py-5">
+        <h3>😢 Нет мемов с этим тегом</h3>
+        <a href="{{ url_for('create') }}" class="btn btn-danger">Создать мем</a>
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock %}

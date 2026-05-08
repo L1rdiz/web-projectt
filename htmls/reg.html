@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Регистрация{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-5">
+        <div class="card bg-dark text-white shadow">
+            <div class="card-header bg-danger text-center">
+                <h4><i class="bi bi-person-plus"></i> Регистрация</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {{ f.hidden_tag() }}
+                    <div class="mb-3">
+                        {{ f.name.label(class="form-label") }}
+                        {{ f.name(class="form-control bg-secondary text-white", placeholder="Имя пользователя") }}
+                        {% for error in f.name.errors %}
+                            <small class="text-danger">{{ error }}</small>
+                        {% endfor %}
+                    </div>
+                    <div class="mb-3">
+                        {{ f.mail.label(class="form-label") }}
+                        {{ f.mail(class="form-control bg-secondary text-white", placeholder="Email") }}
+                        {% for error in f.mail.errors %}
+                            <small class="text-danger">{{ error }}</small>
+                        {% endfor %}
+                    </div>
+                    <div class="mb-3">
+                        {{ f.pwd.label(class="form-label") }}
+                        {{ f.pwd(class="form-control bg-secondary text-white", placeholder="Пароль") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ f.pwd2.label(class="form-label") }}
+                        {{ f.pwd2(class="form-control bg-secondary text-white", placeholder="Подтвердите пароль") }}
+                    </div>
+                    {{ f.sub(class="btn btn-danger w-100") }}
+                </form>
+            </div>
+            <div class="card-footer text-center">
+                <small>Уже есть аккаунт? <a href="{{ url_for('login') }}" class="text-danger">Войди</a></small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

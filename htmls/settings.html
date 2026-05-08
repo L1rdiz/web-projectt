@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Настройки{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card bg-dark text-white shadow">
+            <div class="card-header bg-danger text-center">
+                <h4><i class="bi bi-gear"></i> Настройки</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {{ f.hidden_tag() }}
+                    <div class="mb-3">
+                        {{ f.o.label(class="form-label") }}
+                        {{ f.o(class="form-control bg-secondary text-white", placeholder="Старый пароль") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ f.n.label(class="form-label") }}
+                        {{ f.n(class="form-control bg-secondary text-white", placeholder="Новый пароль") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ f.n2.label(class="form-label") }}
+                        {{ f.n2(class="form-control bg-secondary text-white", placeholder="Повтори пароль") }}
+                    </div>
+                    {{ f.sub(class="btn btn-danger w-100") }}
+                </form>
+                <hr class="bg-secondary">
+                <h5>Сменить имя</h5>
+                <form method="POST" action="{{ url_for('change_name') }}">
+                    <div class="mb-3">
+                        <input type="text" name="nn" class="form-control bg-secondary text-white" placeholder="Новое имя" minlength="3">
+                    </div>
+                    <button type="submit" class="btn btn-outline-danger w-100">Сменить</button>
+                </form>
+            </div>
+        </div>
+        <div class="text-center mt-4">
+            <a href="{{ url_for('profile') }}" class="btn btn-secondary">← Назад</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

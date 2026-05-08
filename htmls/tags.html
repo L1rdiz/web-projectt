@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Теги{% endblock %}
+{% block content %}
+
+<h2 class="text-white mb-4"><i class="bi bi-tags"></i> Популярные теги</h2>
+
+<div class="card bg-dark text-white shadow">
+    <div class="card-body">
+        <div class="d-flex flex-wrap gap-3">
+            {% for name, count in tags %}
+            <a href="{{ url_for('tag', name=name) }}" class="btn btn-outline-danger">
+                <i class="bi bi-hash"></i> {{ name }}
+                <span class="badge bg-danger ms-1">{{ count }}</span>
+            </a>
+            {% else %}
+            <p class="text-white-50">Нет тегов</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

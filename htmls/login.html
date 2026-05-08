@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}Вход{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-5">
+        <div class="card bg-dark text-white shadow">
+            <div class="card-header bg-danger text-center">
+                <h4><i class="bi bi-box-arrow-in-right"></i> Вход</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {{ f.hidden_tag() }}
+                    <div class="mb-3">
+                        {{ f.name.label(class="form-label") }}
+                        {{ f.name(class="form-control bg-secondary text-white", placeholder="Имя пользователя") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ f.pwd.label(class="form-label") }}
+                        {{ f.pwd(class="form-control bg-secondary text-white", placeholder="Пароль") }}
+                    </div>
+                    {{ f.sub(class="btn btn-danger w-100") }}
+                </form>
+            </div>
+            <div class="card-footer text-center">
+                <small>Нет аккаунта? <a href="{{ url_for('reg') }}" class="text-danger">Зарегистрируйся</a></small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

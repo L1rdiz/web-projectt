@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}Создать мем{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card bg-dark text-white shadow">
+            <div class="card-header bg-danger text-center">
+                <h3><i class="bi bi-plus-circle"></i> Создать мем</h3>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {{ f.hidden_tag() }}
+                    <div class="mb-3">
+                        <label class="form-label">Категория</label>
+                        <select id="cat_filter" class="form-select bg-secondary text-white">
+                            <option value="all">Все</option>
+                            <option value="classic">Классические</option>
+                            <option value="animals">Животные</option>
+                            <option value="reaction">Реакции</option>
+                            <option value="custom">Свои</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        {{ f.tmp_id.label(class="form-label") }}
+                        {{ f.tmp_id(class="form-select bg-secondary text-white") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ f.top.label(class="form-label") }}
+                        {{ f.top(class="form-control bg-secondary text-white", rows=2, placeholder="Верхний текст...") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ f.bot.label(class="form-label") }}
+                        {{ f.bot(class="form-control bg-secondary text-white", rows=2, placeholder="Нижний текст...") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ f.tags.label(class="form-label") }}
+                        {{ f.tags(class="form-control bg-secondary text-white", placeholder="funny cat meme") }}
+                        <small class="text-white-50">Теги через пробел, например: смешной кот юмор</small>
+                    </div>
+                    <div id="preview_area" class="mt-3 text-center" style="display: none;">
+                        <img id="preview_img" src="" class="img-fluid rounded" style="max-height: 250px;">
+                    </div>
+                    {{ f.sub(class="btn btn-danger w-100 py-2 mt-3") }}
+                </form>
+            </div>
+        </div>
+        <div class="text-center mt-4">
+            <p class="text-white-50">
+                <i class="bi bi-info-circle"></i>
+                Нет нужного шаблона? <a href="{{ url_for('add') }}">Добавь свой!</a>
+            </p>
+        </div>
+    </div>
+</div>
+
+<script>
+    const catFilter = document.getElementById('cat_filter');
+    const templateSelect = document.getElementById('tmp_id');
+    const previewArea = document.getElementById('preview_area');
+    const previewImg = document.getElementById('preview_img');
+
+    const templates = [
+        {% for x in t %}
+        {id: {{ x.id }}, name: "{{ x.name }}", cat: "{{ x.cat }}", file: "{{ x.file }}"},
+        {% endfor %}
+    ];
+
+    function updateTemplates() {
+        const selectedCat = catFilter.value;
+        let options = '';
+
+        for (let t of templates) {
+            if (selectedCat === 'all' || t.cat === selectedCat) {
+                options += `<option value="${t.id}">${t.name}</option>`;
+            }
+        }
+        templateSelect.innerHTML = options;
+        updatePreview();
+    }
+
+    function updatePreview() {
+        const id = parseInt(templateSelect.value);
+        const tmpl = templates.find(x => x.id === id);
+        if (tmpl && tmpl.file) {
+            previewImg.src = "{{ url_for('static', filename='templates/') }}" + tmpl.file;
+            previewArea.style.display = 'block';
+        } else {
+            previewArea.style.display = 'none';
+        }
+    }
+
+    catFilter.addEventListener('change', updateTemplates);
+    templateSelect.addEventListener('change', updatePreview);
+    updateTemplates();
+</script>
+
+{% endblock %}

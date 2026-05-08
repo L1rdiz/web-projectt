@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}Профиль{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        <div class="card bg-dark text-white shadow mb-4">
+            <div class="card-header bg-danger text-center">
+                <h4><i class="bi bi-person-circle"></i> {{ current_user.name }}</h4>
+            </div>
+            <div class="card-body text-center">
+                <img src="{{ url_for('static', filename='uploads/' + current_user.img) }}"
+                     class="rounded-circle mb-3" width="150" height="150" style="object-fit: cover;">
+                <p class="text-white-50">{{ current_user.mail }}</p>
+                <hr>
+                <div class="row">
+                    <div class="col-6">
+                        <div class="alert alert-danger">
+                            <h5>Мемов</h5>
+                            <h2>{{ current_user.memes|length }}</h2>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="alert alert-info">
+                            <h5>С</h5>
+                            <h6>{{ current_user.date.strftime('%d.%m.%Y') }}</h6>
+                        </div>
+                    </div>
+                </div>
+                <form method="POST" enctype="multipart/form-data">
+                    {{ f.hidden_tag() }}
+                    <div class="mb-3">
+                        {{ f.ava.label(class="form-label") }}
+                        {{ f.ava(class="form-control bg-secondary text-white") }}
+                    </div>
+                    {{ f.sub(class="btn btn-danger w-100") }}
+                </form>
+                <hr>
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('settings') }}" class="btn btn-outline-info">Настройки</a>
+                    <a href="{{ url_for('logout') }}" class="btn btn-outline-warning">Выйти</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="card bg-dark text-white shadow">
+            <div class="card-header bg-danger">
+                <h4><i class="bi bi-images"></i> Мои мемы</h4>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    {% for m in um %}
+                    <div class="col-md-6">
+                        <div class="card bg-secondary">
+                            <img src="{{ url_for('static', filename='generated/' + m.file) }}" class="card-img-top" alt="meme" style="height: 200px; object-fit: cover;">
+                            <div class="card-body">
+                                <p class="card-text small">{{ m.top }}</p>
+                                <div class="d-flex justify-content-between">
+                                    <small>❤️ {{ m.likes }}</small>
+                                    <small>{{ m.date.strftime('%d.%m.%Y') }}</small>
+                                </div>
+                                <div class="d-flex gap-2 mt-2">
+                                    <a href="{{ url_for('view_meme', id=m.id) }}" class="btn btn-sm btn-danger flex-grow-1">Открыть</a>
+                                    <a href="{{ url_for('delete', id=m.id) }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Точно удалить?')">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="col-12 text-center py-5">
+                        <p class="text-white-50">Нет мемов</p>
+                        <a href="{{ url_for('create') }}" class="btn btn-danger">Создать</a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
