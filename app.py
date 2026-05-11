@@ -461,23 +461,35 @@ def tags():
 
 def backup_db():
     try:
-        src = 'instance/memgen.db'
-        if not os.path.exists(src):
-            src = 'memgen.db'
-        if os.path.exists(src):
+        paths = [
+            'var/app-instance/memgen.db',
+            'app-instance/memgen.db',
+            'memgen.db']
+        src = None
+        for p in paths:
+            if os.path.exists(p):
+                src = p
+                print(f"[DEBUG] БД найдена: {src}")
+                break
+        if src:
             backup_dir = 'backups'
             if not os.path.exists(backup_dir):
                 os.makedirs(backup_dir)
+
             name = f"backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}.db"
             dst = os.path.join(backup_dir, name)
             shutil.copy2(src, dst)
+            print(f"[DEBUG] Бэкап создан: {dst}")
             backs = sorted([f for f in os.listdir(backup_dir) if f.startswith('backup_')])
             for old in backs[:-10]:
                 os.remove(os.path.join(backup_dir, old))
             return True
+        else:
+            print(f"[DEBUG] БД не найдена ни в одном пути")
+            return False
     except Exception as e:
-        print(f"backup error: {e}")
-    return False
+        print(f"[DEBUG] Ошибка: {e}")
+        return False
 
 
 @app.route('/backup')
