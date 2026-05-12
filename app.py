@@ -13,6 +13,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, FileField, SelectField, TextAreaField
 from wtforms.validators import DataRequired, Length, EqualTo, ValidationError
 import shutil
+import glob
 
 
 app = Flask(__name__, template_folder='htmls', instance_path=None, instance_relative_config=False)
@@ -192,7 +193,6 @@ def create():
         db.session.flush()
         add_tags(m.id, f.tags.data)
         db.session.commit()
-        backup_db()
         flash('Мем создан!', 'success')
         return redirect(url_for('gallery'))
     return render_template('create.html', f=f, t=t)
@@ -459,71 +459,73 @@ def tags():
     return render_template('tags.html', tags=popular)
 
 
-def backup_db():
-    try:
-        paths = [
-            'var/app-instance/memgen.db',
-            'app-instance/memgen.db',
-            'memgen.db']
-        src = None
-        for p in paths:
-            if os.path.exists(p):
-                src = p
-                print(f"[DEBUG] БД найдена: {src}")
-                break
-        if src:
-            backup_dir = 'backups'
-            if not os.path.exists(backup_dir):
-                os.makedirs(backup_dir)
-
-            name = f"backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}.db"
-            dst = os.path.join(backup_dir, name)
-            shutil.copy2(src, dst)
-            print(f"[DEBUG] Бэкап создан: {dst}")
-            backs = sorted([f for f in os.listdir(backup_dir) if f.startswith('backup_')])
-            for old in backs[:-10]:
-                os.remove(os.path.join(backup_dir, old))
-            return True
-        else:
-            print(f"[DEBUG] БД не найдена ни в одном пути")
-            return False
-    except Exception as e:
-        print(f"[DEBUG] Ошибка: {e}")
+def make_backup():
+    d = datetime.now().strftime('%Y%m%d_%H%M%S')
+    folder = f'backups/bk_{d}'
+    os.makedirs(folder, exist_ok=True)
+    db_files = glob.glob('**/memgen.db', recursive=True)
+    if db_files:
+        db_path = db_files[0]
+        shutil.copy2(db_path, os.path.join(folder, 'db.db'))
+        print(f"[BACKUP] БД скопирована из {db_path}")
+    else:
+        print("[BACKUP] БД не найдена!")
         return False
+    for src, dst in [('static/generated', 'generated'),
+                     ('static/uploads', 'uploads'),
+                     ('static/templates', 'templates')]:
+        if os.path.exists(src):
+            shutil.copytree(src, os.path.join(folder, dst))
+            print(f"[BACKUP] {dst} скопирована")
+    return True
 
 
 @app.route('/backup')
 @login_required
 def backup():
-    if backup_db():
+    try:
+        make_backup()
         flash('Бэкап создан!', 'success')
-    else:
-        flash('Ошибка бэкапа', 'danger')
-    return redirect(url_for('profile'))
+    except Exception as e:
+        flash(f'Ошибка: {e}', 'danger')
+    return redirect(url_for('backups'))
+
+
+@app.route('/restore/<name>')
+@login_required
+def restore(name):
+    src = os.path.join('backups', name)
+    if not os.path.exists(src):
+        flash('Бэкап не найден', 'danger')
+        return redirect(url_for('backups'))
+    try:
+        db_src = os.path.join(src, 'db.db')
+        if os.path.exists(db_src):
+            shutil.copy2(db_src, 'var/app-instance/memgen.db')
+            print(f"[RESTORE] БД восстановлена в var/app-instance/memgen.db")
+        for f in ['generated', 'uploads', 'templates']:
+            src_f = os.path.join(src, f)
+            dst_f = os.path.join('static', f)
+            if os.path.exists(src_f):
+                if os.path.exists(dst_f):
+                    shutil.rmtree(dst_f)
+                shutil.copytree(src_f, dst_f)
+                print(f"[RESTORE] {f} восстановлен")
+
+        flash(' Восстановлено!', 'success')
+    except Exception as e:
+        print(f"[RESTORE] Ошибка: {e}")
+        flash(f'Ошибка: {e}', 'danger')
+    return redirect(url_for('backups'))
 
 
 @app.route('/backups')
 @login_required
 def backups():
-    backup_dir = 'backups'
-    if not os.path.exists(backup_dir):
-        os.makedirs(backup_dir)
-    files = sorted([f for f in os.listdir(backup_dir) if f.endswith('.db')], reverse=True)
-    return render_template('backups.html', files=files)
-
-@app.route('/restore/<name>')
-@login_required
-def restore(name):
-    backup_path = os.path.join('backups', name)
-    db_path = 'instance/memgen.db'
-    if not os.path.exists(db_path):
-        db_path = 'memgen.db'
-    if os.path.exists(backup_path):
-        shutil.copy2(backup_path, db_path)
-        flash(f'Восстановлено из {name}', 'success')
-    else:
-        flash('Файл не найден', 'danger')
-    return redirect(url_for('backups'))
+    items = []
+    if os.path.exists('backups'):
+        items = sorted([f for f in os.listdir('backups') if f.startswith('bk_')], reverse=True)
+    return render_template('backups.html', backups=items)
 
 
 if __name__ == '__main__':
